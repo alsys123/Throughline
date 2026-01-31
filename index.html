@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Through Line - Daily Word Puzzle</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+```
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        color: #333;
+    }
+
+    .container {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        max-width: 500px;
+        width: 100%;
+        padding: 40px;
+        position: relative;
+    }
+
+    header {
+        text-align: center;
+        margin-bottom: 40px;
+        border-bottom: 2px solid #e0e0e0;
+        padding-bottom: 20px;
+    }
+
+    h1 {
+        font-size: 2.5rem;
+        color: #1e3c72;
+        font-weight: 300;
+        letter-spacing: 2px;
+        margin-bottom: 8px;
+    }
+
+    .tagline {
+        color: #666;
+        font-size: 0.95rem;
+        font-weight: 300;
+        letter-spacing: 1px;
+    }
+
+    .date {
+        color: #999;
+        font-size: 0.85rem;
+        margin-top: 8px;
+        font-weight: 400;
+    }
+
+    .instructions {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+        border-left: 4px solid #2a5298;
+    }
+
+    .instructions p {
+        color: #555;
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+
+    .input-section {
+        margin-bottom: 30px;
+    }
+
+    .input-wrapper {
+        position: relative;
+        margin-bottom: 15px;
+    }
+
+    input[type="text"] {
+        width: 100%;
+        padding: 16px 20px;
+        font-size: 1.1rem;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-weight: 500;
+    }
+
+    input[type="text"]:focus {
+        outline: none;
+        border-color: #2a5298;
+        box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
+    }
+
+    .submit-btn {
+        width: 100%;
+        padding: 16px;
+        background: #2a5298;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    .submit-btn:hover {
+        background: #1e3c72;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(42, 82, 152, 0.3);
+    }
+
+    .submit-btn:active {
+        transform: translateY(0);
+    }
+
+    .submit-btn:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    .words-grid {
+        display: grid;
+        gap: 12px;
+        margin-bottom: 30px;
+    }
+
+    .word-item {
+        background: #f8f9fa;
+        padding: 18px 24px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: all 0.4s ease;
+        border: 2px solid transparent;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .word-number {
+        font-size: 0.85rem;
+        color: #999;
+        font-weight: 600;
+        min-width: 30px;
+    }
+
+    .word-text {
+        font-size: 1.2rem;
+        font-weight: 500;
+        color: #333;
+        letter-spacing: 1px;
+        flex-grow: 1;
+        text-align: center;
+    }
+
+    .word-connection {
+        font-size: 0.9rem;
+        color: #2a5298;
+        font-weight: 500;
+        opacity: 0;
+        min-width: 120px;
+        text-align: right;
+        transition: opacity 0.4s ease;
+    }
+
+    .word-item.revealed {
+        background: linear-gradient(135deg, #e8f0fe 0%, #f0f4ff 100%);
+        border-color: #2a5298;
+    }
+
+    .word-item.revealed .word-connection {
+        opacity: 1;
+    }
+
+    .feedback {
+        text-align: center;
+        padding: 16px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-weight: 500;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        font-size: 1rem;
+    }
+
+    .feedback.show {
+        opacity: 1;
+    }
+
+    .feedback.error {
+        background: #fee;
+        color: #c33;
+        border: 1px solid #fcc;
+    }
+
+    .feedback.success {
+        background: #efe;
+        color: #3a3;
+        border: 1px solid #cfc;
+    }
+
+    .stats {
+        display: flex;
+        justify-content: space-around;
+        margin-top: 30px;
+        padding-top: 30px;
+        border-top: 2px solid #e0e0e0;
+    }
+
+    .stat-item {
+        text-align: center;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 600;
+        color: #2a5298;
+        display: block;
+    }
+
+    .stat-label {
+        font-size: 0.85rem;
+        color: #666;
+        margin-top: 4px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .celebration {
+        display: none;
+        text-align: center;
+        padding: 30px;
+        margin-top: 20px;
+    }
+
+    .celebration.show {
+        display: block;
+        animation: fadeInScale 0.5s ease;
+    }
+
+    .celebration h2 {
+        color: #2a5298;
+        font-size: 2rem;
+        margin-bottom: 15px;
+        font-weight: 400;
+    }
+
+    .celebration p {
+        color: #666;
+        font-size: 1.1rem;
+        line-height: 1.6;
+    }
+
+    @keyframes fadeInScale {
+        from {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .word-item.revealed .word-connection {
+        animation: slideInRight 0.4s ease;
+    }
+
+    @media (max-width: 600px) {
+        .container {
+            padding: 30px 20px;
+        }
+
+        h1 {
+            font-size: 2rem;
+        }
+
+        .word-text {
+            font-size: 1.1rem;
+        }
+
+        .word-connection {
+            font-size: 0.8rem;
+            min-width: 100px;
+        }
+    }
+
+    .hint-btn {
+        background: transparent;
+        border: 2px solid #2a5298;
+        color: #2a5298;
+        padding: 12px 24px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.95rem;
+        font-weight: 500;
+        margin-top: 10px;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .hint-btn:hover {
+        background: #2a5298;
+        color: white;
+    }
+
+    .hint-btn:disabled {
+        border-color: #ccc;
+        color: #ccc;
+        cursor: not-allowed;
+    }
+
+    .attempts-counter {
+        text-align: center;
+        color: #666;
+        font-size: 0.9rem;
+        margin-top: 10px;
+    }
+</style>
+```
+
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>THROUGH LINE</h1>
+            <div class="tagline">Find the connecting word</div>
+            <div class="date" id="current-date"></div>
+        </header>
+
+```
+    <div class="instructions">
+        <p>Find one word that can combine with each of the 8 words below to form a valid phrase or compound word. The connecting word can come <strong>before</strong> or <strong>after</strong> each word.</p>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+
+    <div class="input-section" id="input-section">
+        <div class="input-wrapper">
+            <input 
+                type="text" 
+                id="guess-input" 
+                placeholder="Enter your answer..."
+                autocomplete="off"
+                maxlength="20"
+            >
+        </div>
+        <button class="submit-btn" id="submit-btn">Submit Answer</button>
+        <div class="attempts-counter" id="attempts-counter">Attempts: 0</div>
+    </div>
+
+    <div class="words-grid" id="words-grid"></div>
+
+    <div class="celebration" id="celebration">
+        <h2>Brilliant! 🎉</h2>
+        <p>You've found the connection. The answer brings all eight words together perfectly.</p>
+    </div>
+
+    <div class="stats">
+        <div class="stat-item">
+            <span class="stat-value" id="attempts-stat">0</span>
+            <span class="stat-label">Attempts</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-value" id="solved-stat">—</span>
+            <span class="stat-label">Status</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Puzzle data - each puzzle has 8 words and an answer
+    const puzzles = [
+        {
+            words: ['WASH', 'BALL', 'BROW', 'WITNESS', 'OPENER', 'CATCHER', 'DROP', 'SHADOW'],
+            answer: 'EYE',
+            connections: ['EYEWASH', 'EYEBALL', 'EYEBROW', 'EYEWITNESS', 'EYE OPENER', 'EYECATCHER', 'EYE DROP', 'EYE SHADOW']
+        },
+        {
+            words: ['MUSIC', 'KEEPER', 'SAVER', 'ZONE', 'BOMB', 'CLOCK', 'PIECE', 'SHARE'],
+            answer: 'TIME',
+            connections: ['TIME MUSIC', 'TIMEKEEPER', 'TIMESAVER', 'TIME ZONE', 'TIME BOMB', 'TIME CLOCK', 'TIMEPIECE', 'TIMESHARE']
+        },
+        {
+            words: ['PRINT', 'NAIL', 'TIP', 'FOOD', 'PAINTING', 'PRINT', 'BONE', 'WRITING'],
+            answer: 'FINGER',
+            connections: ['FINGERPRINT', 'FINGERNAIL', 'FINGERTIP', 'FINGER FOOD', 'FINGER PAINTING', 'FINGERPRINT', 'FINGER BONE', 'FINGER WRITING']
+        },
+        {
+            words: ['AGENT', 'ESTATE', 'PROPERTY', 'ESTATE', 'TIME', 'WORLD', 'LIFE', 'DEAL'],
+            answer: 'REAL',
+            connections: ['REAL AGENT', 'REAL ESTATE', 'REAL PROPERTY', 'REAL ESTATE', 'REAL TIME', 'REAL WORLD', 'REAL LIFE', 'REAL DEAL']
+        },
+        {
+            words: ['CARD', 'NOTE', 'LINER', 'COPY', 'LAND', 'WARE', 'DISK', 'BALL'],
+            answer: 'HARD',
+            connections: ['HARD CARD', 'HARD NOTE', 'HARDLINER', 'HARD COPY', 'HARDLAND', 'HARDWARE', 'HARD DISK', 'HARDBALL']
+        }
+    ];
+
+    // Get puzzle for today (cycles through available puzzles)
+    function getTodaysPuzzle() {
+        const today = new Date();
+        const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / 86400000);
+        const puzzleIndex = dayOfYear % puzzles.length;
+        return puzzles[puzzleIndex];
+    }
+
+    // Game state
+    let currentPuzzle = getTodaysPuzzle();
+    let attempts = 0;
+    let solved = false;
+
+    // DOM elements
+    const guessInput = document.getElementById('guess-input');
+    const submitBtn = document.getElementById('submit-btn');
+    const wordsGrid = document.getElementById('words-grid');
+    const feedback = document.getElementById('feedback');
+    const attemptsCounter = document.getElementById('attempts-counter');
+    const celebration = document.getElementById('celebration');
+    const attemptsStat = document.getElementById('attempts-stat');
+    const solvedStat = document.getElementById('solved-stat');
+    const currentDate = document.getElementById('current-date');
+
+    // Initialize game
+    function init() {
+        // Set date
+        const today = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        currentDate.textContent = today.toLocaleDateString('en-US', options);
+
+        // Render words
+        renderWords();
+
+        // Event listeners
+        submitBtn.addEventListener('click', handleSubmit);
+        guessInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleSubmit();
+        });
+
+        // Focus input
+        guessInput.focus();
+    }
+
+    function renderWords() {
+        wordsGrid.innerHTML = '';
+        currentPuzzle.words.forEach((word, index) => {
+            const wordItem = document.createElement('div');
+            wordItem.className = 'word-item';
+            wordItem.innerHTML = `
+                <span class="word-number">${index + 1}</span>
+                <span class="word-text">${word}</span>
+                <span class="word-connection"></span>
+            `;
+            wordsGrid.appendChild(wordItem);
+        });
+    }
+
+    function handleSubmit() {
+        if (solved) return;
+
+        const guess = guessInput.value.trim().toUpperCase();
+        
+        if (!guess) {
+            showFeedback('Please enter a word', 'error');
+            return;
+        }
+
+        attempts++;
+        attemptsCounter.textContent = `Attempts: ${attempts}`;
+        attemptsStat.textContent = attempts;
+
+        if (guess === currentPuzzle.answer.toUpperCase()) {
+            handleCorrectAnswer();
+        } else {
+            showFeedback('Not quite. Keep trying!', 'error');
+            guessInput.value = '';
+            guessInput.focus();
+        }
+    }
+
+    function handleCorrectAnswer() {
+        solved = true;
+        solvedStat.textContent = '✓';
+        
+        showFeedback('Perfect! You found it!', 'success');
+        
+        // Hide input section
+        document.getElementById('input-section').style.display = 'none';
+        
+        // Reveal connections with animation
+        const wordItems = document.querySelectorAll('.word-item');
+        wordItems.forEach((item, index) => {
+            setTimeout(() => {
+                item.classList.add('revealed');
+                const connectionSpan = item.querySelector('.word-connection');
+                connectionSpan.textContent = currentPuzzle.connections[index];
+            }, index * 150);
+        });
+
+        // Show celebration
+        setTimeout(() => {
+            celebration.classList.add('show');
+        }, wordItems.length * 150 + 300);
+    }
+
+    function showFeedback(message, type) {
+        feedback.textContent = message;
+        feedback.className = `feedback ${type} show`;
+        
+        setTimeout(() => {
+            feedback.classList.remove('show');
+        }, 3000);
+    }
+
+    // Initialize on load
+    init();
+</script>
+```
+
+</body>
+</html>
