@@ -1,4 +1,4 @@
-# Throughline
+# Throughline renamed to throughPhase
 Word game
 entry point:
 
